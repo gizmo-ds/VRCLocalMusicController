@@ -5,6 +5,8 @@ import (
 	kbe "github.com/micmonay/keybd_event"
 )
 
+var firstTrigger = make(map[string]bool)
+
 func init() {
 	gin.SetMode(gin.ReleaseMode)
 }
@@ -15,17 +17,35 @@ func main() {
 		panic(err)
 	}
 
+	firstTrigger = map[string]bool{
+		"prev": true,
+		"play": true,
+		"next": true,
+	}
+
 	g := gin.Default()
 
 	g.GET("/event", func(c *gin.Context) {
 		e := c.Query("event")
 		switch e {
 		case "prev":
-			kb.SetKeys(kbe.VK_MEDIA_PREV_TRACK)
+			if !firstTrigger["prev"] {
+				kb.SetKeys(kbe.VK_MEDIA_PREV_TRACK)
+			} else {
+				firstTrigger["prev"] = false
+			}
 		case "play":
-			kb.SetKeys(kbe.VK_MEDIA_PLAY_PAUSE)
+			if !firstTrigger["play"] {
+				kb.SetKeys(kbe.VK_MEDIA_PLAY_PAUSE)
+			} else {
+				firstTrigger["play"] = false
+			}
 		case "next":
-			kb.SetKeys(kbe.VK_MEDIA_NEXT_TRACK)
+			if !firstTrigger["next"] {
+				kb.SetKeys(kbe.VK_MEDIA_NEXT_TRACK)
+			} else {
+				firstTrigger["next"] = false
+			}
 		}
 		kb.Launching()
 		c.Status(404)
