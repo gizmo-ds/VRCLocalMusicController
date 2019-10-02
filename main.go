@@ -9,18 +9,18 @@ var firstTrigger = make(map[string]bool)
 
 func init() {
 	gin.SetMode(gin.ReleaseMode)
+
+	firstTrigger = map[string]bool{
+		"prev": true,
+		"play": true,
+		"next": true,
+	}
 }
 
 func main() {
 	kb, err := kbe.NewKeyBonding()
 	if err != nil {
 		panic(err)
-	}
-
-	firstTrigger = map[string]bool{
-		"prev": true,
-		"play": true,
-		"next": true,
 	}
 
 	g := gin.Default()
@@ -45,6 +45,12 @@ func main() {
 				kb.SetKeys(kbe.VK_MEDIA_NEXT_TRACK)
 			} else {
 				firstTrigger["next"] = false
+			}
+		case "reset_first":
+			firstTrigger = map[string]bool{
+				"prev": true,
+				"play": true,
+				"next": true,
 			}
 		}
 		kb.Launching()
